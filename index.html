@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>عرض سعر / QUOTATION</title>
+
+<!-- خط Cairo -->
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+
+<style>
+  :root{
+    /* غيّر الألوان بسهولة */
+    --brand: #e9c64e;      /* اللون الرئيسي (كان أحمر في العينة) */
+    --brand-weak: #e9c64e; /* خلفيات لطيفة */
+    --text: #222;
+    --muted: #666;
+    --border: #E5E7EB;
+  }
+  html,body{height:100%}
+  body{
+    font-family: "Cairo", system-ui, -apple-system, "Segoe UI", Roboto, Arial, "Noto Kufi Arabic", sans-serif;
+    color: var(--text);
+    background: #f6f7fb;
+    margin: 0;
+    padding: 24px;
+  }
+
+  .sheet{
+    width: 250mm;               /* A4 */
+    min-height: 50mm;
+    margin: 0 auto;
+    background: #fff;
+    box-shadow: 0 10px 30px rgba(0,0,0,.08);
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* الزاوية العلوية المنحنية (ديكور) */
+  .corner{
+    position: absolute;
+    top: -140px; left: auto; right: -140px;
+    width: 360px; height: 360px;
+    background: var(--brand);
+    border-radius: 40px;
+    transform: rotate(45deg);
+    opacity: .12;
+    pointer-events: none;
+  }
+
+  /* الهيدر */
+  header{
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: center;
+    gap: 16px;
+    padding: 30px 30px 8px;
+    border-bottom: 3px solid var(--brand);
+  }
+  .brand{
+    display: flex; align-items: center; gap: 16px;
+  }
+  .logo{
+    width: 76px; height: 76px; border-radius: 16px;
+    background: var(--brand-weak);
+    display: grid; place-items: center;
+    border: 2px solid var(--brand);
+    font-weight: 800; color: var(--brand); font-size: 20px;
+    user-select: none;
+  }
+  .brand h1{
+    margin: 0; line-height: 1.15; font-weight: 800; font-size: 22px;
+  }
+  .brand .vat{ color: var(--muted); font-size: 13px }
+
+  .meta{
+    text-align: left;
+    direction: ltr;                   /* تبقى أرقام وأكواد LTR */
+    font-size: 13px;
+  }
+  .meta div{ margin: 2px 0 }
+  .tag{
+    display:inline-block; padding: 4px 10px; border-radius: 999px;
+    background: var(--brand-weak); color: var(--brand); font-weight:700; font-size: 12px;
+  }
+
+  /* عنوان المستند */
+  .title{
+    padding: 10px 28px 0;
+    text-align:center;
+    letter-spacing:.5px;
+    font-weight:800; font-size: 18px; color:#111;
+  }
+
+  /* بلوكات المعلومات */
+  .blocks{
+    display: grid; gap: 5px;
+    grid-template-columns: 1.2fr 1fr;
+    padding: 1px 1px 0;
+  }
+  .block{
+    border:1px solid var(--border); border-radius: 10px; padding: 1px 1px;
+    background: #fff;
+  }
+  .block h3{ margin:0 0 6px; font-size: 14px; color:#111 }
+  .block .row{
+    display: grid; grid-template-columns: 50px 1fr; gap:8px; font-size: 13px; margin: 3px 0;
+  }
+  .muted{ color: var(--muted) }
+
+  /* الجدول */
+  table{
+    width: calc(100% - 56px);
+    margin: 16px 28px 6px;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+  thead th{
+    background: var(--brand-weak);
+    color: #111; font-weight: 700;
+    border: 1px solid var(--border);
+    padding: 3px 3px; text-align: center;
+  }
+  tbody td{
+    border: 1px solid var(--border);
+    padding: 3px 3px; text-align: center;
+  }
+  tbody td.desc{ text-align: right }
+
+  .actions{
+    display:flex; gap:8px; align-items:center; justify-content:flex-start;
+    margin: 8px 28px 0;
+  }
+  .btn{
+    border: 0; border-radius: 10px; padding: 10px 14px; cursor: pointer;
+    background: var(--brand); color: #fff; font-weight: 700; font-size: 14px;
+  }
+  .btn.sec{ background:#111; color:#fff }
+  .btn.ghost{
+    background: transparent; color: var(--brand); border:2px solid var(--brand);
+  }
+
+  /* المجاميع */
+  .totals{
+    width: calc(150% - 56px);
+    margin: 8px 28px 0;
+    display: grid; grid-template-columns: 1fr 360px; gap: 12px;
+  }
+  .sum{
+    border:1px solid var(--border); border-radius:10px; overflow: hidden;
+  }
+  .sum .row{
+    display:grid; grid-template-columns: 1fr 140px; gap:8px;
+    padding:8px 12px; border-bottom:1px solid var(--border); font-size: 13px;
+  }
+  .sum .row:last-child{ border-bottom:0 }
+  .sum .row.total{
+    background: var(--brand-weak); font-weight: 800;
+  }
+
+  /* الشروط والتوقيع */
+  .terms{
+    width: calc(100% - 56px);
+    margin: 12px 10px 0;
+    display: grid; grid-template-columns: 1.2fr 1fr; gap: 1px;
+  }
+  .terms .box{
+    border:1px solid var(--border); border-radius:10px; padding:5px;
+    font-size: 10px; min-height: 3px;
+  }
+  .sign{
+    border:1px dashed var(--border); border-radius: 10px; padding: 12px;
+    text-align: center; min-height: 120px;
+  }
+  .stamp{
+    width: 120px; height: 120px; border: 3px dashed var(--brand); border-radius: 50%;
+    margin: 8px auto 0; opacity:.35;
+  }
+
+  /* الفوتر */
+  footer{
+    margin-top: 1px; padding: 10px 30px 16px;
+    background: linear-gradient(90deg, var(--brand-weak), #fff);
+    border-top: 2px solid var(--brand);
+    display:grid; grid-template-columns: 1fr 1fr; gap: 12px; align-items:center;
+    font-size: 12px; color: var(--muted);
+  }
+  footer .left{ direction: ltr; text-align: left }
+
+  /* عناصر قابلة للتحرير */
+  [contenteditable="true"]{
+    outline: none;
+  }
+  [contenteditable="true"]:focus{
+    box-shadow: inset 0 -2px 0 var(--brand);
+  }
+
+  /* الطباعة */
+  @page{ size: A4; margin: 1mm }
+  @media print{
+    body{ background: #fff; padding: 0 }
+    .sheet{ box-shadow:none; width:auto; min-height:auto; }
+    .actions, print-hide .btn.print-hide{ display:none !important }
+    .corner{ opacity:.12 }
+  }
+</style>
+</head>
+<body>
+
+<div class="sheet" id="sheet">
+  <div class="corner"></div>
+
+  <header>
+    <div class="brand">
+      <!-- ضع شعارك كصورة داخل div.logo أو استبدله بـ <img> -->
+
+      <div>
+        <h1 contenteditable="true">مؤسسة كفة الزمان للمقاولات العامه</h1>
+        <div class="vat" contenteditable="true">الرقم الضريبي: 312864227700003
+</div>
+        <div class="vat" contenteditable="true">السجل التجاري: 7048945955
+</div>
+      </div>
+    </div>
+    <div class="meta">
+      <div><span class="tag">QUOTATION / اقتباس</span></div>
+      <div>Quote No: <span contenteditable="true" id="qNo"></span></div>
+      <div>Quote Date: <span contenteditable="true" id="qDate"></span></div>
+    </div>
+  </header>
+
+  <div class="title">عرض سعر</div>
+
+  <section class="blocks">
+    <div class="block">
+      <h3>إلى / To</h3>
+      <div class="row"><div class="muted">العميل:</div><div contenteditable="true"> </div></div>
+      <div class="row"><div class="muted">الدولة:</div><div contenteditable="true">المملكة العربية السعودية</div></div>
+      <div class="row"></div>
+    </div>
+
+    <div class="block">
+      <h3>من / From</h3>
+      <div class="row"><div class="muted">الشركة:</div><div contenteditable="true">مؤسسة كفة الزمان للمقاولات العامة</div></div>
+      <div class="row"><div class="muted">الهاتف:</div><div contenteditable="true">+966 563998798 </div></div>
+      <div class="row"><div class="muted">البريد:</div><div contenteditable="true">info@example.com</div></div>
+      <div class="row"><div class="muted">العنوان:</div><div contenteditable="true">المدينة المنورة ، المملكة العربية السعودية</div></div>
+    </div>
+  </section>
+
+  <table id="items">
+    <thead>
+      <tr>
+        <th style="width:46px">#</th>
+        <th>الوصف والمواصفات<br/>Description & Specifications</th>
+        <th style="width:80px">الوحدة<br/>Unit</th>
+        <th style="width:72px">الكمية<br/>Qty</th>
+        <th style="width:100px">سعر الوحدة<br/>Unit Rate</th>
+        <th style="width:90px">خصم<br/>Disc</th>
+        <th style="width:90px">ضريبة %15<br/>VAT 15%</th>
+        <th style="width:120px">المبلغ<br/>Amount</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>1</td>
+        <td class="desc" contenteditable="true">تركيب رخام ارضيات </td>
+        <td contenteditable="true"> </td>
+        <td contenteditable="true" class="num">1</td>
+        <td contenteditable="true" class="num">30.00</td>
+        <td contenteditable="true" class="num">0.00</td>
+        <td class="num vat">0.00</td>
+        <td class="num amount">0.00</td>
+        <td class="print-hide"><button class="btn ghost small" onclick="removeRow(this)">حذف</button></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="actions print-hide">
+    <button class="btn" onclick="addRow()">إضافة بند</button>
+    <button class="btn sec" onclick="recalc()">تحديث المبالغ</button>
+    <button class="btn" onclick="window.print()">طباعة</button>
+  </div>
+
+  <section class="totals">
+
+    <div class="sum">
+      <div class="row"><div>الإجمالي الفرعي / Sub-Total</div><div class="num" id="subTotal">0.00</div></div>
+      <div class="row"><div>ضريبة القيمة المضافة 15% / VAT 15%</div><div class="num" id="vatTotal">0.00</div></div>
+      <div class="row total"><div>الإجمالي الكلي / Total Amount (SAR)</div><div class="num" id="grandTotal">0.00</div></div>
+    </div>
+  </section>
+
+  <section class="terms">
+    <div class="box" contenteditable="true">
+      <strong>الشروط والأحكام / Terms & Conditions</strong>
+      <ul style="margin:6px 18px">
+        <li>الأسعار تشمل ضريبة القيمة المضافة بنسبة 15%.</li>
+        <li>الدفع: عند الاستحقاق/تحويل بنكي.</li>
+        <li>العمل وفقًا لمواصفات السلامة المعتمدة.</li>
+      </ul>
+    </div>
+    <div class="sign">
+      <div><strong>الختم </strong></div>
+      <div class="stamp"></div>
+      <div class="muted" contenteditable="true">الاسم: ________ • التاريخ: ________</div>
+    </div>
+  </section>
+
+  <footer>
+    <div>
+      <div contenteditable="true"><strong>العنوان:</strong> المدينة المنورة، المملكة العربية السعودية</div>
+      <div class="muted" contenteditable="true">ص.ب </div>
+    </div>
+    <div class="left">
+      <div contenteditable="true">☎ +966 533105509</div>
+      <div contenteditable="true">✉ info@example.com • www.example.com</div>
+    </div>
+  </footer>
+</div>
+
+<script>
+  // تنسيق رقمين عشريين
+  const fmt = n => (isFinite(n)? Number(n).toFixed(2) : '0.00');
+
+  function recalc(){
+    const rows = document.querySelectorAll('#items tbody tr');
+    let sub = 0, vat = 0;
+    rows.forEach(tr=>{
+      const qty = parseFloat(tr.querySelector('td:nth-child(4)')?.innerText.replace(/,/g,'') || 0);
+      const rate= parseFloat(tr.querySelector('td:nth-child(5)')?.innerText.replace(/,/g,'') || 0);
+      const disc= parseFloat(tr.querySelector('td:nth-child(6)')?.innerText.replace(/,/g,'') || 0);
+      const line = Math.max(qty*rate - disc, 0);
+      const v    = line * 0.15;
+      tr.querySelector('.vat').innerText = fmt(v);
+      tr.querySelector('.amount').innerText = fmt(line + v);
+      sub += line;
+      vat += v;
+    });
+    document.getElementById('subTotal').innerText  = fmt(sub);
+    document.getElementById('vatTotal').innerText  = fmt(vat);
+    document.getElementById('grandTotal').innerText= fmt(sub + vat);
+  }
+
+  function addRow(){
+    const tbody = document.querySelector('#items tbody');
+    const index = tbody.children.length + 1;
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${index}</td>
+      <td class="desc" contenteditable="true">بند جديد / New Item</td>
+      <td contenteditable="true">PCS</td>
+      <td contenteditable="true" class="num">1</td>
+      <td contenteditable="true" class="num">0.00</td>
+      <td contenteditable="true" class="num">0.00</td>
+      <td class="num vat">0.00</td>
+      <td class="num amount">0.00</td>
+      <td class="print-hide"><button class="btn ghost small" onclick="removeRow(this)">حذف</button></td>
+    `;
+    tbody.appendChild(tr);
+    recalc();
+  }
+
+  function removeRow(btn){
+    const tr = btn.closest('tr');
+    tr.parentNode.removeChild(tr);
+    // إعادة ترقيم الصفوف
+    document.querySelectorAll('#items tbody tr').forEach((r,i)=>r.children[0].innerText = i+1);
+    recalc();
+  }
+
+  // أعِد الحساب عند أي تعديل
+  document.addEventListener('input', (e)=>{
+    if(e.target.closest('#items')) recalc();
+  });
+
+  // حساب أولي
+  recalc();
+</script>
+</body>
+</html>
